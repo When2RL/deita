@@ -20,6 +20,7 @@ parser.add_argument("--device", type=int, default="0")
 
 args = parser.parse_args()
 
+print('received arguments: ', args)
 filter_pipeline = Pipeline("filter_pipeline", 
                           data_path = args.data_path,  # json file with sharegpt format
                           other_data_path = args.other_data_path,  # embedding file path (pickle format)

@@ -1,5 +1,17 @@
 # Deita
 
+
+## Run instructions
+
+For a dataset x, do:
+1. reformat the dataset into a format that can be readin by this repo, say it outputs `tmp.json`
+2. run `examples/pipelines/score_complexity_dataset.sh` to obtain `tmp_complexity.json`
+3. run `examples/pipelines/score_quality_dataset.sh` to obtain `tmp_complexity_quality.json`
+4. run `examples/pipelines/embed_dataset.sh` to obtain `tmp_embeddings.pkl`
+5. run `examples/pipelines/filter_dataset.sh` to take in `tmp_complexity_quality.json` and `tmp_embeddings.pkl` obtain `tmp_deita.json`.
+
+
+## Original README
 <p align="center">
   <img src="./assets/logo-final.png" width="600">
 </p>

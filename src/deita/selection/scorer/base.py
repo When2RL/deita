@@ -2,24 +2,35 @@ import numpy as np
 from scipy.special import softmax
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import logging
+import openai
+
 
 logger = logging.getLogger(__name__)
 
+
 class Scorer(object):
     
-    def __init__(self, model_name_or_path: str, is_vllm: bool  = False, **kwargs):
+    def __init__(self, model_name_or_path: str, is_vllm: bool  = False, is_sglang: bool = False, **kwargs):
         
         self.is_vllm = is_vllm
+        self.is_sglang = is_sglang
         
-        if not is_vllm:
-            self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
-            self.model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
-        else:
-            
+        if is_vllm:
             from vllm import LLM, SamplingParams
             
             self.llm = LLM(model_name_or_path)
-            self.sampling_params = SamplingParams(max_tokens = 2, logprobs = 1000)
+            self.sampling_params = SamplingParams(max_tokens = 2, logprobs = 5)
+        elif is_sglang:
+            sglang_url = kwargs.get("sglang_url")
+            self.sglang_client = openai.Client(base_url=sglang_url, api_key="EMPTY")
+            self.sglang_sampling_params = {
+                "temperature": 1.0,
+                "max_tokens": 2,
+                "logprobs": 10,
+            }
+        else:
+            self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
+            self.model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
         
     def infer_score(self, user_input: str):
 
@@ -27,10 +38,21 @@ class Scorer(object):
         
         if self.is_vllm:
             outputs = self.llm.generate(user_input, self.sampling_params)
-            score_template = np.array([1,2,3,4,5,6])
             
             try:
                 logprobs_list = outputs[0].outputs[0].logprobs[0]
+            except IndexError:
+                return 3.0
+        elif self.is_sglang:
+            outputs = self.sglang_client.completions.create(
+                model="default",
+                prompt=user_input,
+                **self.sglang_sampling_params
+            )
+
+            try:
+                print(outputs)
+                logprobs_list = outputs.choices[0].logprobs
             except IndexError:
                 return 3.0
         else:

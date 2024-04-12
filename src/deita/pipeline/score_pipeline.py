@@ -20,13 +20,15 @@ class ScorePipeline(BasePipeline):
         
         scorer = kwargs.get("scorer")
         is_vllm = kwargs.get("is_vllm")
+        is_sglang = kwargs.get("is_sglang")
+        sglang_url = kwargs.get("sglang_url")
         scorer_name_or_path = kwargs.get("scorer_name_or_path")
         self.score_type = kwargs.get("score_type")
         
         if scorer == "llama":
-            self.model = Llama_Scorer(scorer_name_or_path, is_vllm)
+            self.model = Llama_Scorer(scorer_name_or_path, is_vllm, is_sglang, sglang_url=sglang_url)
         elif scorer == "mistral":
-            self.model = Mistral_Scorer(scorer_name_or_path, is_vllm)
+            self.model = Mistral_Scorer(scorer_name_or_path, is_vllm, is_sglang, sglang_url=sglang_url)
         
         self.output_path = kwargs.get("output_path")
         
