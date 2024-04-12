@@ -18,15 +18,15 @@ class Scorer(object):
         if is_vllm:
             from vllm import LLM, SamplingParams
             
-            self.llm = LLM(model_name_or_path)
-            self.sampling_params = SamplingParams(max_tokens = 2, logprobs = 5)
+            self.llm = LLM(model_name_or_path, max_logprobs=2000)
+            self.sampling_params = SamplingParams(max_tokens = 2, logprobs = 2000)
         elif is_sglang:
             sglang_url = kwargs.get("sglang_url")
             self.sglang_client = openai.Client(base_url=sglang_url, api_key="EMPTY")
             self.sglang_sampling_params = {
                 "temperature": 1.0,
                 "max_tokens": 2,
-                "logprobs": 10,
+                "logprobs": 2000,
             }
         else:
             self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
@@ -40,9 +40,10 @@ class Scorer(object):
             outputs = self.llm.generate(user_input, self.sampling_params)
             
             try:
-                logprobs_list = outputs[0].outputs[0].logprobs[0]
+                logprobs_dict = outputs[0].outputs[0].logprobs[0]
+                logprobs_dict = {k: v.logprob for k, v in logprobs_dict.items()}
             except IndexError:
-                return 3.0
+                return -100.0
         elif self.is_sglang:
             outputs = self.sglang_client.completions.create(
                 model="default",
@@ -51,35 +52,37 @@ class Scorer(object):
             )
 
             try:
-                print(outputs)
-                logprobs_list = outputs.choices[0].logprobs
+                ## TODO: not really implemented yet
+                logprobs_dict = outputs.choices[0].logprobs
             except IndexError:
-                return 3.0
+                return -101.0
         else:
             input_ids = self.tokenizer.encode(user_input, return_tensors = "pt")
             outputs = self.model.generate(input_ids, max_new_tokens = max_length, num_return_sequences = 1, return_dict_in_generate = True, output_scores = True)
             
             try:
-                logprobs_list = outputs.scores[0][0]
+                logprobs_dict = outputs.scores[0][0]
             except IndexError:
-                return 3.0
-            
+                return -102.0
+        
+        
         score_logits = []
-        score_template = np.array([1,2,3,4,5,6])
+        score_template = np.array([1,2,3,4,5,6], dtype=np.float32)
         for k in self.id2score:
-            try:
-                score_logits.append(logprobs_list[k])
-            except KeyError:
-                return 3.0
-                
-        score_logits = np.array(score_logits)
-        score_npy = softmax(score_logits, axis=0)
-        score_npy = score_npy * score_template
+            score_logits.append(logprobs_dict.get(k, -np.infty))
+        
+        try:
+            score_logits = np.array(score_logits)
+            score_npy = softmax(score_logits, axis=0)
+            score_npy = score_npy * score_template
 
-        score_npy = np.sum(score_npy, axis=0)
+            score_npy = np.sum(score_npy, axis=0)
+        except Exception:
+            return -103.0
         
         return score_npy
-            
+    
+    
     def infer_complexity(self, input_text: str):
         
         complexity_template = self.complexity_template

@@ -3,12 +3,15 @@
 
 ## Run instructions
 
-For a dataset x, do:
-1. reformat the dataset into a format that can be readin by this repo, say it outputs `tmp.json`
-2. run `examples/pipelines/score_complexity_dataset.sh` to obtain `tmp_complexity.json`
-3. run `examples/pipelines/score_quality_dataset.sh` to obtain `tmp_complexity_quality.json`
-4. run `examples/pipelines/embed_dataset.sh` to obtain `tmp_embeddings.pkl`
-5. run `examples/pipelines/filter_dataset.sh` to take in `tmp_complexity_quality.json` and `tmp_embeddings.pkl` obtain `tmp_deita.json`.
+We have made modifications so that all the scripts can directly read from `when2rl` datasets from huggingface, instead of a local json file. Therefore, all you need to do is:
+For a dataset `when2rl/UltraFeedback_binarized_cleaned_annotated`, do:
+
+1. run `export PYTHONPATH=$(pwd)/src`
+1. run `examples/pipelines/score_complexity_dataset.sh` to obtain `ultrafbk_complexity.json`
+2. run `examples/pipelines/score_quality_dataset.sh` to obtain `ultrafbk_quality.json`
+3. run `examples/pipelines/combine_scores.sh` to obtain `ultrafbk_complexity_quality.json`
+3. run `examples/pipelines/embed_dataset.sh` to obtain `ultrafbk_embeddings.pkl`
+5. run `examples/pipelines/filter_dataset.sh` to take in `ultrafbk_complexity_quality.json` and `ultrafbk_embeddings.pkl` obtain `ultrafbk_deita.csv`.
 
 
 ## Original README

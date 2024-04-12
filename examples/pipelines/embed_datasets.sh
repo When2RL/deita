@@ -1,8 +1,10 @@
 GPUIDX="4,5,6,7"
 NUMPROCESS=4
 BSZ=1
-DATAPATH="data/deita/tmp_complexity_quality.json"
-OUTPUTPATH="data/deita/tmp_embeddings.pkl"
+# DATAPATH="when2rl/UltraFeedback_binarized_cleaned_annotated"
+# OUTPUTPATH="data/deita/ultrafbk_embeddings.pkl"
+DATAPATH="when2rl/distilabel-intel-orca-dpo-pairs_cleaned_reformatted"
+OUTPUTPATH="data/deita/orca-pairs_embeddings.pkl"
 
 CUDA_VISIBLE_DEVICES=$GPUIDX accelerate launch \
 --mixed_precision bf16 \

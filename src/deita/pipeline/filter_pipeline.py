@@ -79,13 +79,25 @@ class FilterPipeline(BasePipeline):
     
     def _save_data(self, json_data: List, results: List) -> None:
         
+        # selected_data = []
+        
+        # for idx in results:
+        #     selected_data.append(json_data[idx])
+        
+        # with open(self.output_path, "w") as f:
+        #     json.dump(selected_data, f, indent=2, ensure_ascii=False)
+
+        ### save full_id only
         selected_data = []
         
         for idx in results:
-            selected_data.append(json_data[idx])
+            full_id = json_data[idx]["full_id"]
+            prompt_id = json_data[idx]["prompt_id"]
+            selected_data.append({
+                "full_id": full_id,
+                "prompt_id": prompt_id
+            })
         
-        with open(self.output_path, "w") as f:
-            json.dump(selected_data, f, indent=2, ensure_ascii=False)
-            
-        
-        
+        tmp_df = pd.DataFrame(selected_data)
+        tmp_df.to_csv(self.output_path, index=False)
+        return

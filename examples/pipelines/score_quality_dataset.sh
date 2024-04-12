@@ -1,16 +1,19 @@
 
 SCORETYPE="quality"
-DATAPATH="data/deita/tmp_complexity.json" # PATH/TO/DATASET
-OUTPUTPATH="data/deita/tmp_complexity_quality.json"  # PATH/TO/OUTPUTS
-MODELPATH="hkust-nlp/deita-quality-scorer"    # PATH/TO/MODEL
+# DATAPATH="when2rl/UltraFeedback_binarized_cleaned_annotated"
+# OUTPUTPATH="data/deita/ultafbk_quality.json"
+# OUTPUTPATH="data/deita/ultafbk_quality_mistral.json"
+DATAPATH="when2rl/distilabel-intel-orca-dpo-pairs_cleaned_reformatted"
+OUTPUTPATH="data/deita/orca-pairs_quality.json"
+MODELPATH="hkust-nlp/deita-quality-scorer"  # this is llama architecture
 SCORER="llama"
-ISVLLM=true
-GPUINDICES="0"
+# MODELPATH="mistralai/Mistral-7B-v0.1"
+# SCORER="mistral"
+GPUINDICES="7"
 
 CUDA_VISIBLE_DEVICES=$GPUINDICES python examples/pipelines/score_complexity_dataset.py \
 --data_path $DATAPATH \
 --output_path $OUTPUTPATH \
 --score_type $SCORETYPE \
 --scorer $SCORER \
---scorer_name_or_path $MODELPATH \
---is_vllm $ISVLLM
+--scorer_name_or_path $MODELPATH

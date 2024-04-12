@@ -7,7 +7,10 @@ from deita.pipeline.utils import load_data
 import logging
 from tqdm import tqdm
 
+
 logger = logging.getLogger(__name__)
+
+
 
 class ScorePipeline(BasePipeline):
     
@@ -35,7 +38,7 @@ class ScorePipeline(BasePipeline):
         if not os.path.exists(self.output_path):
             os.makedirs(os.path.dirname(self.output_path), exist_ok=True)
     
-    def _load_sharegpt(self, data: str) -> List:
+    def _load_sharegpt(self, data: list) -> List:
         
         preprocessed_data = []
         
@@ -59,14 +62,21 @@ class ScorePipeline(BasePipeline):
     
     def _inject_sharegpt(self, json_data: List, results: List) -> None:
         
-        for sample_id in range(len(json_data)):
+        # for sample_id in range(len(json_data)):
             
+        #     json_data[sample_id][f"{self.score_type}_scores"] = []
+                
+        #     for item in results[sample_id]["conversations"]:
+        #         json_data[sample_id][f"{self.score_type}_scores"].append(float(item[f"{self.score_type}_score"]))
+        for sample_id in range(len(json_data)):
+            json_data[sample_id].pop("conversations")
             json_data[sample_id][f"{self.score_type}_scores"] = []
                 
             for item in results[sample_id]["conversations"]:
                 json_data[sample_id][f"{self.score_type}_scores"].append(float(item[f"{self.score_type}_score"]))
-        
-        
+        return
+    
+    
     def _preprocess(self, json_data, other_data) -> List:
         
         if self.data_format == "sharegpt":
@@ -95,11 +105,17 @@ class ScorePipeline(BasePipeline):
     
     def _save_data(self, json_data: List, results: List) -> None:
         
-        if self.data_format == "sharegpt":
-            self._inject_sharegpt(json_data, results)
-        else:
-            raise ValueError(f"Data format {self.data_format} not supported.")
+        # if self.data_format == "sharegpt":
+        #     self._inject_sharegpt(json_data, results)
+        # else:
+        #     raise ValueError(f"Data format {self.data_format} not supported.")
+        
+        # with open(self.output_path, "w") as f:
+        #     json.dump(json_data, f, indent=2, ensure_ascii=False)
+        #     logger.info(f"Saved results to {self.output_path}.")
+        self._inject_sharegpt(json_data, results)
         
         with open(self.output_path, "w") as f:
             json.dump(json_data, f, indent=2, ensure_ascii=False)
             logger.info(f"Saved results to {self.output_path}.")
+        return
