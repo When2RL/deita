@@ -1,12 +1,12 @@
 
 SCORETYPE="complexity"
-DATAPATH="data/deita_mix_100.json"
-OUTPUTPATH="outputs/deita_mix_complexity/deita_mix_complexity_mistral_sampled.json"
-MODELPATH="/data/data9/outputs/complexity-scorer-mistral-z"
-SCORER="mistral"
-ISVLLM=false
+DATAPATH="data/deita/tmp.json"
+OUTPUTPATH="data/deita/tmp_complexity.json"
+MODELPATH="hkust-nlp/deita-complexity-scorer"
+SCORER="llama"
+ISVLLM=true
 
-python examples/scoring/score_complexity_dataset.py \
+python examples/pipelines/score_complexity_dataset.py \
     --data_path $DATAPATH \
     --output_path $OUTPUTPATH \
     --score_type $SCORETYPE \

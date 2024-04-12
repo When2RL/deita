@@ -4,6 +4,8 @@ __pycache__
 *dist*
 *egg-info
 .history
-data/
+data
 outputs/
 logs/
+
+.vscode
